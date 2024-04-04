@@ -1,24 +1,20 @@
 use rustfft::{FftPlanner, num_complex::Complex};
 use peroxide::fuga::*;
-
-/// Generate Gaussian Random Fields for a given range
-pub fn gen_grf(x_min: f64, x_max: f64, sigma: f64, n: usize) -> Vec<f64> {
-    let x_range = x_max - x_min;
-    let sigma_new = sigma / x_range;
-    grf(n, sigma_new)
-}
+use puruspe::Inu_Knu;
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 
 /// Gaussian Random Fields using circulant embedding method 1
 ///
 /// * Reference: Chan, Grace., An Effective Method for Simulating Gaussian Random Fields (1999)
-fn grf(n: usize, sigma: f64) -> Vec<f64> {
+pub fn grf(n: usize, kernel: Kernel) -> Vec<f64> {
     // Calculate the power of 2 greater than or equal to 2(n-1)
     let g = (2f64 * (n - 1) as f64).log2().ceil() as i32;
     let mut m = 2f64.powi(g) as usize;
 
     // Perform circulant embedding until a valid embedding is found
     let qa = loop {
-        let c = circulant_embedding(m, n, |x| gaussian_kernel(x, sigma));
+        let c = circulant_embedding(m, n, |dx| kernel.eval(dx));
         let mut planner = FftPlanner::new();
         let fft = planner.plan_fft_forward(m);
         let mut c_fft = c.iter().map(|x| Complex::new(*x, 0f64)).collect::<Vec<_>>();
@@ -92,7 +88,48 @@ pub fn trunc(x: f64) -> f64 {
     }
 }
 
-/// Stationary Gaussian Kernel
-pub fn gaussian_kernel(dx: f64, sigma: f64) -> f64 {
-    (-dx.powi(2) / (2.0 * sigma.powi(2))).exp()
+/// Kernel type
+#[derive(Debug, Clone, Copy)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+pub enum Kernel {
+    /// Squared exponential kernel
+    ///
+    /// # Parameters
+    /// - `sigma`: Length scale
+    ///
+    /// **Caution**: for the circulant embedding, the length scale is corresponded to the range (0,1)
+    SquaredExponential(f64),
+    /// Matern kernel
+    ///
+    /// # Parameters
+    /// - `nu`: Smoothness parameter
+    /// - `rho`: Length scale
+    ///
+    /// **Caution**: for the circulant embedding, the length scale is corresponded to the range (0,1)
+    Matern(f64, f64),
+}
+
+impl Kernel {
+    pub fn eval(&self, dx: f64) -> f64 {
+        match self {
+            Kernel::SquaredExponential(sigma) => squared_exponential(dx, *sigma),
+            Kernel::Matern(nu, rho) => matern(dx, *nu, *rho),
+        }
+    }
+}
+
+/// Squared exponential kernel
+pub fn squared_exponential(dx: f64, sigma: f64) -> f64 {
+   (-dx.powi(2) / (2.0 * sigma.powi(2))).exp()
+}
+
+/// Matern kernel
+pub fn matern(dx: f64, nu: f64, rho: f64) -> f64 {
+    let sqrt_2_nu = (2.0 * nu).sqrt();
+    let mut sqrt_2_nu_dx_rho = sqrt_2_nu * dx.abs() / rho;
+    if sqrt_2_nu_dx_rho == 0f64 {
+        sqrt_2_nu_dx_rho = 1e-6;
+    }
+    let (_, knu) = Inu_Knu(nu, sqrt_2_nu_dx_rho);
+    2f64.powf(1f64 - nu) / gamma(nu) * (sqrt_2_nu_dx_rho).powf(nu) * knu
 }

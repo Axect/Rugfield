@@ -1,6 +1,6 @@
 [package]
 name = "rugfield"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["axect <axect@outlook.kr>"]
 edition = "2021"
 description = "A Rust library for generating Gaussian Random Fields using the circulant embedding method"
@@ -12,8 +12,13 @@ categories = ["science"]
 exclude = ["examples/"]
 
 [dependencies]
-peroxide = "0.34.7"
+peroxide = "0.35"
+puruspe = "0.2.4"
 rustfft = "6.2.0"
+serde = { version = "1.0", features = ["derive"], optional = true }
 
 [dev-dependencies]
-peroxide = { version = "0.34.7", features = ["plot"] }
+peroxide = { version = "0.35", features = ["plot"] }
+
+[features]
+serde = ["dep:serde", "peroxide/serde"]

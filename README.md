@@ -15,12 +15,12 @@ To use `rugfield` in your Rust project, add the following to your `Cargo.toml` f
 
 ```toml
 [dependencies]
-rugfield = "0.1.0"
+rugfield = "0.2.0"
 ```
 
 ## Usage
 
-Here's an example of how to use `rugfield` to generate multiple Gaussian Random Fields and plot them: ([`examples/simple.rs`](examples/simple.rs))
+Here's an example of how to use `rugfield` to generate multiple Gaussian Random Fields and plot them: ([`examples/simple.rs`](examples/sqaured_exponential_test))
 
 ```rust
 use rugfield::gen_grf;
