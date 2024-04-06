@@ -7,7 +7,9 @@
 - Generate Gaussian Random Fields for a specified range and sigma value
 - Implements the circulant embedding method for efficient GRF generation
 - Utilizes the `rustfft` library for Fast Fourier Transform (FFT) operations
-- Provides a stationary Gaussian kernel function
+- Provides some kernel functions.
+  - `Kernel::SquaredExponential(sigma: f64)`
+  - `Kernel::Matern(nu: f64, rho: f64)`
 
 ## Installation
 
@@ -20,24 +22,24 @@ rugfield = "0.2.0"
 
 ## Usage
 
-Here's an example of how to use `rugfield` to generate multiple Gaussian Random Fields and plot them: ([`examples/simple.rs`](examples/sqaured_exponential_test))
+Here's an example of how to use `rugfield` to generate multiple Gaussian Random Fields and plot them: ([`examples/squared_exponential_test.rs`](examples/sqaured_exponential_test.rs))
 
 ```rust
-use rugfield::gen_grf;
+use rugfield::{grf, Kernel};
 use peroxide::fuga::*;
 use std::error::Error;
 
 fn main() -> Result<(), Box<dyn Error>> {
     let x_max = 10.0;
     let x_min = 0.0;
-    let sigma = 1.0;
+    let sigma = 0.1; // independent to the range (correspond to length 1)
     let n = 1000;
     let samples = 8;
 
     let x = linspace_with_precision(x_min, x_max, n, 2);
 
     let grfs = (0..samples)
-        .map(|_| gen_grf(x_min, x_max, sigma, n))
+        .map(|_| grf(n, Kernel::SquaredExponential(sigma)))
         .collect::<Vec<_>>();
 
     // Plot
@@ -45,11 +47,8 @@ fn main() -> Result<(), Box<dyn Error>> {
 }
 ```
 
-This example generates multiple Gaussian Random Fields with a range from 0.0 to 10.0, a sigma value of 1.0, and a size of 1000. It then plots the generated GRFs using different line styles and colors. (To run this example, you'll need to use `plot` feature in `peroxide` crate.)
 
-Here's the resulting plot:
-
-![Simple GRF Plot](examples/simple.png)
+![Simple GRF Plot](examples/assets/squared_exponential_test.png)
 
 ## Dependencies
 
