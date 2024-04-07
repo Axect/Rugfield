@@ -5,7 +5,11 @@ Rugfield is a Rust library for generating Gaussian Random Fields (GRFs) using th
 ## Features
 
 - Generate GRFs using the circulant embedding method
-- Support for squared exponential and Matérn kernels
+- Support for various kernels.
+  - `SquaredExponential`
+  - `Matern`
+  - `LocalPeriodic`
+  - `RationalQuadratic`
 - Efficient computation using the `rustfft` library
 - Optional serialization support with the `serde` feature
 
@@ -15,7 +19,7 @@ Add the following to your `Cargo.toml` file:
 
 ```toml
 [dependencies]
-rugfield = "0.2.0"
+rugfield = "0.2.1"
 ```
 
 ## Usage

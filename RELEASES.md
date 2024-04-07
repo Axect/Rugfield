@@ -1,4 +1,10 @@
-# Ver 0.2.0
+# Ver 0.2.1 (2024-04-07)
+
+- Implement more kernels
+  - `LocalPeriodic`
+  - `RationalQuadratic`
+
+# Ver 0.2.0 (2024-04-06)
 
 - Remove `gen_grf` function
 - Implement Matern kernel

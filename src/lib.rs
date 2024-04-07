@@ -95,7 +95,7 @@ pub enum Kernel {
     /// Squared exponential kernel
     ///
     /// # Parameters
-    /// - `sigma`: Length scale
+    /// - `l`: Length scale
     ///
     /// **Caution**: for the circulant embedding, the length scale is corresponded to the range (0,1)
     SquaredExponential(f64),
@@ -107,20 +107,34 @@ pub enum Kernel {
     ///
     /// **Caution**: for the circulant embedding, the length scale is corresponded to the range (0,1)
     Matern(f64, f64),
+    /// Locally Periodic kernel
+    ///
+    /// # Parameters
+    /// - `p`: Period
+    /// - `l`: Length scale
+    LocalPeriodic(f64, f64),
+    /// Rational Quadratic kernel
+    ///
+    /// # Parameters
+    /// - `alpha`: Smoothness parameter
+    /// - `l`: Length scale
+    RationalQuadratic(f64, f64),
 }
 
 impl Kernel {
     pub fn eval(&self, dx: f64) -> f64 {
         match self {
-            Kernel::SquaredExponential(sigma) => squared_exponential(dx, *sigma),
+            Kernel::SquaredExponential(l) => squared_exponential(dx, *l),
             Kernel::Matern(nu, rho) => matern(dx, *nu, *rho),
+            Kernel::LocalPeriodic(p, l) => periodic(dx, *p, *l) * squared_exponential(dx, *l),
+            Kernel::RationalQuadratic(alpha, l) => rational_quadratic(dx, *alpha, *l),
         }
     }
 }
 
 /// Squared exponential kernel
-pub fn squared_exponential(dx: f64, sigma: f64) -> f64 {
-   (-dx.powi(2) / (2.0 * sigma.powi(2))).exp()
+pub fn squared_exponential(dx: f64, l: f64) -> f64 {
+   (-dx.powi(2) / (2.0 * l.powi(2))).exp()
 }
 
 /// Matern kernel
@@ -132,4 +146,14 @@ pub fn matern(dx: f64, nu: f64, rho: f64) -> f64 {
     }
     let (_, knu) = Inu_Knu(nu, sqrt_2_nu_dx_rho);
     2f64.powf(1f64 - nu) / gamma(nu) * (sqrt_2_nu_dx_rho).powf(nu) * knu
+}
+
+/// Periodic kernel
+pub fn periodic(dx: f64, p: f64, l: f64) -> f64 {
+    (-(2f64 * (std::f64::consts::PI * dx.abs() / p).sin().powi(2)) / l.powi(2)).exp()
+}
+
+/// Rational Quadratic kernel
+pub fn rational_quadratic(dx: f64, alpha: f64, l: f64) -> f64 {
+    (1.0 + dx.powi(2) / (2.0 * alpha * l.powi(2))).powf(-alpha)
 }
