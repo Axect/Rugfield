@@ -1,6 +1,6 @@
 [package]
 name = "rugfield"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["axect <axect@outlook.kr>"]
 edition = "2021"
 description = "A Rust library for generating Gaussian Random Fields using the circulant embedding method"
