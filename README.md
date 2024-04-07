@@ -1,19 +1,17 @@
 # Rugfield
 
-`rugfield` is a Rust library for generating Gaussian Random Fields (GRF) using the circulant embedding method. It provides a simple and efficient way to generate GRFs for a given range and sigma value.
+Rugfield is a Rust library for generating Gaussian Random Fields (GRFs) using the circulant embedding method. It provides an efficient and easy-to-use implementation for simulating GRFs with various kernel functions.
 
 ## Features
 
-- Generate Gaussian Random Fields for a specified range and sigma value
-- Implements the circulant embedding method for efficient GRF generation
-- Utilizes the `rustfft` library for Fast Fourier Transform (FFT) operations
-- Provides some kernel functions.
-  - `Kernel::SquaredExponential(sigma: f64)`
-  - `Kernel::Matern(nu: f64, rho: f64)`
+- Generate GRFs using the circulant embedding method
+- Support for squared exponential and Matérn kernels
+- Efficient computation using the `rustfft` library
+- Optional serialization support with the `serde` feature
 
 ## Installation
 
-To use `rugfield` in your Rust project, add the following to your `Cargo.toml` file:
+Add the following to your `Cargo.toml` file:
 
 ```toml
 [dependencies]
@@ -22,51 +20,63 @@ rugfield = "0.2.0"
 
 ## Usage
 
-Here's an example of how to use `rugfield` to generate multiple Gaussian Random Fields and plot them: ([`examples/squared_exponential_test.rs`](examples/sqaured_exponential_test.rs))
+Here's a simple example of how to use Rugfield to generate a GRF with a squared exponential kernel:
 
 ```rust
 use rugfield::{grf, Kernel};
-use peroxide::fuga::*;
-use std::error::Error;
 
-fn main() -> Result<(), Box<dyn Error>> {
-    let x_max = 10.0;
-    let x_min = 0.0;
-    let sigma = 0.1; // independent to the range (correspond to length 1)
-    let n = 1000;
-    let samples = 8;
+fn main() {
+    let n = 100;
+    let kernel = Kernel::SquaredExponential(0.1);
+    let grf_data = grf(n, kernel);
 
-    let x = linspace_with_precision(x_min, x_max, n, 2);
-
-    let grfs = (0..samples)
-        .map(|_| grf(n, Kernel::SquaredExponential(sigma)))
-        .collect::<Vec<_>>();
-
-    // Plot
-    // ... (omit plotting code)
+    // Plot the GRF data
+    // ...
 }
 ```
 
+This code generates a GRF with a squared exponential kernel and a length scale of 0.1. The resulting GRF data is stored in the `grf_data` vector.
 
-![Simple GRF Plot](examples/assets/squared_exponential_test.png)
+For a complete example, see the `examples/squared_exponential.rs` file:
 
-## Dependencies
+```rust
+use peroxide::fuga::*;
+use rugfield::{grf, Kernel::SquaredExponential};
 
-`rugfield` depends on the following libraries:
+fn main() -> Result<(), Box<dyn Error>> {
+    let x_max = 100.0;
+    let x_min = 0.0;
+    let sigma = 0.1;
+    let n = 1000;
+    let samples = 8;
+    let kernel = SquaredExponential(sigma);
+    let x = linspace_with_precision(x_min, x_max, n, 2);
+    let grfs = (0..samples).map(|_| grf(n, kernel)).collect::<Vec<_>>();
 
-- `rustfft`: For performing Fast Fourier Transform operations
-- `peroxide`: For random number generation and plotting
+    // Plot the GRF data
+    // ...
 
-Make sure to have these dependencies installed in your project.
+    Ok(())
+}
+```
+
+The above code generates multiple GRFs with a squared exponential kernel and plots the resulting data. Here's an example output:
+
+![Squared Exponential GRF](examples/assets/squared_exponential_test.png)
 
 ## Documentation
 
-For more detailed information about the functions and their usage, please refer to the documentation comments in the source code.
-
-## Contributing
-
-Contributions to `rugfield` are welcome! If you find any issues or have suggestions for improvements, please open an issue or submit a pull request on the GitHub repository.
+For detailed documentation and API reference, please refer to the [Rustdoc documentation](https://docs.rs/rugfield).
 
 ## License
 
-`rugfield` is licensed under the [MIT License](LICENSE).
+Rugfield is licensed under the [MIT License](LICENSE).
+
+## Contributing
+
+Contributions are welcome! If you find any issues or have suggestions for improvements, please open an issue or submit a pull request on the [GitHub repository](https://github.com/Axect/rugfield).
+
+## Acknowledgments
+
+Rugfield was inspired by the paper "An Effective Method for Simulating Gaussian Random Fields" by Grace Chan (1999).
+We would like to express our gratitude to the authors of the `rustfft` library for their excellent work, which has been instrumental in the development of Rugfield.
