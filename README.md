@@ -19,7 +19,7 @@ Add the following to your `Cargo.toml` file:
 
 ```toml
 [dependencies]
-rugfield = "0.2.1"
+rugfield = "0.2.2"
 ```
 
 ## Usage
@@ -61,6 +61,21 @@ fn main() -> Result<(), Box<dyn Error>> {
     // ...
 
     Ok(())
+}
+```
+
+With a specific random number generator:
+
+```rust
+use peroxide::fuga::*;
+use rugfield::{grf_with_rng, Kernel::SquaredExponential};
+
+fn main() -> Result<(), Box<dyn Error>> {
+    let n = 100;
+    let kernel = SquaredExponential(0.1);
+    let mut rng = stdrng_from_seed(42);
+    let grf_data = grf_with_rng(&mut rng, n, kernel);
+    // ...
 }
 ```
 

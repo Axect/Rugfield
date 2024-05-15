@@ -12,13 +12,13 @@ categories = ["science"]
 exclude = ["examples/"]
 
 [dependencies]
-peroxide = "0.35"
+peroxide = "0.37"
 puruspe = "0.2.4"
 rustfft = "6.2.0"
 serde = { version = "1.0", features = ["derive"], optional = true }
 
 [dev-dependencies]
-peroxide = { version = "0.35", features = ["plot"] }
+peroxide = { version = "0.37", features = ["plot"] }
 
 [features]
 serde = ["dep:serde", "peroxide/serde"]

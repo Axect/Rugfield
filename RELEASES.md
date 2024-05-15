@@ -1,3 +1,8 @@
+# Ver 0.2.2 (2024-05-15)
+
+- Implement `grf_with_rng` function
+- Bump `peroxide` to `0.37.3`
+
 # Ver 0.2.1 (2024-04-07)
 
 - Implement more kernels

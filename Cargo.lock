@@ -3,6 +3,12 @@
 version = 3
 
 [[package]]
+name = "anyhow"
+version = "1.0.83"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "25bdb32cbbdce2b519a9cd7df3a678443100e265d5e25ca763b7572a5104f5f3"
+
+[[package]]
 name = "autocfg"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -182,13 +188,21 @@ dependencies = [
 ]
 
 [[package]]
-name = "peroxide"
-version = "0.35.1"
+name = "paste"
+version = "1.0.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "862dbe06b505e9778df88403d674c4474fed4e540fffd2519271707a8ed23a26"
+checksum = "57c0d7b74b563b49d38dae00a0c37d4d6de9b432382b2892f0574ddcae73fd0a"
+
+[[package]]
+name = "peroxide"
+version = "0.37.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "95d9cf170b9accd215e430d099bae42f69de51024dbeda6d6f3c4cf48923f23c"
 dependencies = [
+ "anyhow",
  "matrixmultiply",
  "order-stat",
+ "paste",
  "peroxide-ad",
  "peroxide-num",
  "puruspe",
@@ -379,7 +393,7 @@ dependencies = [
 
 [[package]]
 name = "rugfield"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "peroxide",
  "puruspe",
