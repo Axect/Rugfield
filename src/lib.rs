@@ -1,6 +1,6 @@
-use rustfft::{FftPlanner, num_complex::Complex};
 use peroxide::fuga::*;
 use puruspe::Inu_Knu;
+use rustfft::{num_complex::Complex, FftPlanner};
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
@@ -20,7 +20,10 @@ pub fn grf(n: usize, kernel: Kernel) -> Vec<f64> {
         let mut c_fft = c.iter().map(|x| Complex::new(*x, 0f64)).collect::<Vec<_>>();
         fft.process(&mut c_fft);
         let c_fft = c_fft.iter().map(|x| x.re).collect::<Vec<_>>();
-        let c_min = c_fft.iter().min_by(|&x, &y| x.partial_cmp(y).unwrap()).unwrap();
+        let c_min = c_fft
+            .iter()
+            .min_by(|&x, &y| x.partial_cmp(y).unwrap())
+            .unwrap();
 
         if c_min >= &0f64 {
             break c_fft.fmap(|t| t.sqrt());
@@ -43,7 +46,8 @@ pub fn grf(n: usize, kernel: Kernel) -> Vec<f64> {
     z_fft.iter_mut().for_each(|x| *x /= m as f64);
 
     // Multiply the inverse FFT result with the square root of the circulant embedding
-    let mut a = z_fft.into_iter()
+    let mut a = z_fft
+        .into_iter()
         .zip(qa)
         .map(|(x, y)| x * y)
         .collect::<Vec<_>>();
@@ -54,10 +58,7 @@ pub fn grf(n: usize, kernel: Kernel) -> Vec<f64> {
     fft.process(&mut a);
 
     // Extract the real part of the FFT result
-    let y = a
-        .iter()
-        .map(|x| x.re)
-        .collect::<Vec<_>>();
+    let y = a.iter().map(|x| x.re).collect::<Vec<_>>();
 
     // Return the first n elements of the result
     y[..n].to_vec()
@@ -66,6 +67,22 @@ pub fn grf(n: usize, kernel: Kernel) -> Vec<f64> {
 /// Gaussian Random Fields using circulant embedding method 1 with rng
 ///
 /// * Reference: Chan, Grace., An Effective Method for Simulating Gaussian Random Fields (1999)
+///
+/// # Example
+/// ```
+/// use peroxide::fuga::*;
+/// use rugfield::{grf_with_rng, Kernel::SquaredExponential};
+///
+/// fn main() -> Result<(), Box<dyn Error>> {
+///     let n = 100;
+///     let kernel = SquaredExponential(0.1);
+///     let mut rng = stdrng_from_seed(42);
+///     let grf_data = grf_with_rng(&mut rng, n, kernel);
+///     // ...
+///
+///     Ok(())
+/// }
+/// ```
 pub fn grf_with_rng<R: Rng + Clone>(rng: &mut R, n: usize, kernel: Kernel) -> Vec<f64> {
     // Calculate the power of 2 greater than or equal to 2(n-1)
     let g = (2f64 * (n - 1) as f64).log2().ceil() as i32;
@@ -79,7 +96,10 @@ pub fn grf_with_rng<R: Rng + Clone>(rng: &mut R, n: usize, kernel: Kernel) -> Ve
         let mut c_fft = c.iter().map(|x| Complex::new(*x, 0f64)).collect::<Vec<_>>();
         fft.process(&mut c_fft);
         let c_fft = c_fft.iter().map(|x| x.re).collect::<Vec<_>>();
-        let c_min = c_fft.iter().min_by(|&x, &y| x.partial_cmp(y).unwrap()).unwrap();
+        let c_min = c_fft
+            .iter()
+            .min_by(|&x, &y| x.partial_cmp(y).unwrap())
+            .unwrap();
 
         if c_min >= &0f64 {
             break c_fft.fmap(|t| t.sqrt());
@@ -102,7 +122,8 @@ pub fn grf_with_rng<R: Rng + Clone>(rng: &mut R, n: usize, kernel: Kernel) -> Ve
     z_fft.iter_mut().for_each(|x| *x /= m as f64);
 
     // Multiply the inverse FFT result with the square root of the circulant embedding
-    let mut a = z_fft.into_iter()
+    let mut a = z_fft
+        .into_iter()
         .zip(qa)
         .map(|(x, y)| x * y)
         .collect::<Vec<_>>();
@@ -113,10 +134,7 @@ pub fn grf_with_rng<R: Rng + Clone>(rng: &mut R, n: usize, kernel: Kernel) -> Ve
     fft.process(&mut a);
 
     // Extract the real part of the FFT result
-    let y = a
-        .iter()
-        .map(|x| x.re)
-        .collect::<Vec<_>>();
+    let y = a.iter().map(|x| x.re).collect::<Vec<_>>();
 
     // Return the first n elements of the result
     y[..n].to_vec()
@@ -128,11 +146,11 @@ pub fn circulant_embedding<F: Fn(f64) -> f64>(m: usize, n: usize, kernel: F) -> 
     let mid = m / 2;
 
     // Compute the first half of the circulant embedding using the provided kernel function
-    for i in 0 .. mid + 1 {
+    for i in 0..mid + 1 {
         c[i] = kernel(i as f64 / n as f64);
     }
     // Mirror the first half to complete the circulant embedding
-    for i in mid + 1 .. m {
+    for i in mid + 1..m {
         c[i] = c[m - i];
     }
     c
@@ -193,7 +211,7 @@ impl Kernel {
 
 /// Squared exponential kernel
 pub fn squared_exponential(dx: f64, l: f64) -> f64 {
-   (-dx.powi(2) / (2.0 * l.powi(2))).exp()
+    (-dx.powi(2) / (2.0 * l.powi(2))).exp()
 }
 
 /// Matern kernel
