@@ -1,3 +1,8 @@
+# Ver 0.2.3 (2025-05-09)
+
+- Bump `peroxide` to `0.39`
+- Bump `puruspe` to `0.4`
+
 # Ver 0.2.2 (2024-05-15)
 
 - Implement `grf_with_rng` function
